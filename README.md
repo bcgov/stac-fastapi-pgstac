@@ -1,9 +1,5 @@
 # stac-fastapi-pgstac
 
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/stac-utils/stac-fastapi-pgstac/cicd.yaml?style=for-the-badge)](https://github.com/stac-utils/stac-fastapi-pgstac/actions/workflows/cicd.yaml)
-[![PyPI](https://img.shields.io/pypi/v/stac-fastapi.pgstac?style=for-the-badge)](https://pypi.org/project/stac-fastapi.pgstac)
-[![Documentation](https://img.shields.io/github/actions/workflow/status/stac-utils/stac-fastapi-pgstac/pages.yml?label=Docs&style=for-the-badge)](https://stac-utils.github.io/stac-fastapi-pgstac/)
-[![License](https://img.shields.io/github/license/stac-utils/stac-fastapi-pgstac?style=for-the-badge)](https://github.com/stac-utils/stac-fastapi-pgstac/blob/main/LICENSE)
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/10407788/174893876-7a3b5b7a-95a5-48c4-9ff2-cc408f1b6af9.png" style="vertical-align: middle; max-width: 400px; max-height: 100px;" height=100 />
@@ -28,6 +24,46 @@ PgSTAC stores all collection and item records as jsonb fields exactly as they co
 |                          2.5 | >=0.7,<0.8 |
 |                          3.0 | >=0.8,<0.9 |
 |                          4.0 | >=0.8,<0.10 |
+## Openshift
+Postgres bitnami db can be deployed with helm charts/pgstac
+```
+helm upgrade --install charts/pgstac/
+```
+after deployment migrate to pgstac
+
+```
+Python -m venv venv
+Source venv/bin/activate
+python -m pip install pypgstac[psycopg]
+export PGHOST='127.0.0.1'
+export PGPORT='5432'
+export PGUSER='quickuser'
+export PGDATABASE='bcstac'
+export PGPASSWORD='quickpass'
+pypgstac migrate
+```
+#
+Debugging stac-fastapi-pgstac with docker (need to figure out networking to openshift)
+? 
+would this flag work  
+--add-host=host.docker.internal:host-gateway
+
+```
+docker build -t bc-stac-api .
+docker run \
+    -p 8080:8080 \
+    --name=bc-stac-api \
+    --rm \
+    --detach \
+    --env-file=./.env \
+    bc-stac-api
+```
+Debug from inside container
+```
+docker run -it --env-file=./.env bc-stac-api bash
+uvicorn stac_fastapi.pgstac.app:app --host 127.0.0.1 --port 8080
+```
+
 
 ## Usage
 
